@@ -15,20 +15,15 @@ print("The word racecar being a palindrome is:", is_palindrome_iterative("raceca
 
 
 def is_palindrome_recursive(word):
-    # Remove spaces and convert to lowercase for case-insensitive comparison
-    word = word.replace(" ", "").lower()
-
-    # Base case: if the word is empty or has only one character, it's a palindrome
     if len(word) <= 1:
         return True
 
-    # Check if the first and last characters are the same
+    # sammenligner first og last bokstav
     if word[0] == word[-1]:
-        # Recursively check the substring without the first and last characters
+        # Hopper over first og last bokstav
         return is_palindrome_recursive(word[1:-1])
 
     return False
 
-# Test the function
 print("The word hello being a palindrome is:", is_palindrome_recursive("hello"))  # Output: False
 print("The word racecar being a palindrome is:", is_palindrome_recursive("racecar"), "\n")  # Output: True
