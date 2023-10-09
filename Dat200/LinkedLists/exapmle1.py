@@ -62,7 +62,6 @@ class LinkedList:
         newnode = Node(data)
         leng = self.len_of_list()
 
-
         if position == 1:
             self.pushfront(data)
         
