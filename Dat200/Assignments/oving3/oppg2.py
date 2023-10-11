@@ -42,3 +42,4 @@ for solution in solutions:
     for row in solution:
         print(row)
     print()
+ 
