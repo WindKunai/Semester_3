@@ -1,6 +1,6 @@
 [project]
-name = "socialinsecurity"
-version = "0.1.0"
+name = ""
+version = ""
 description = ""
 authors = [
     { name = "solbero", email = "njosol@pm.me" },
@@ -14,10 +14,6 @@ dependencies = [
 requires-python = ">=3.11"
 license = { text = "MIT" }
 readme = "README.md"
-
-[build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
 
 [tool.pdm]
 [tool.pdm.dev-dependencies]
