@@ -75,14 +75,13 @@ def index():
         time.sleep(2)
 
         # Use parameterized query to avoid SQL injection
-        get_user_query = """
-            SELECT *
-            FROM Users
-            WHERE username = ?;
-        """
+    
         user = sqlite.select_user_by_username(username)
-        user = sqlite.query(get_user_query, True, (username,))
+        
 
+        if not login_form.password.data:
+            flash("Sorry, failed to log in", category="warning")
+            return redirect(url_for("index"))
         hashed_password = bcrypt.hashpw(login_form.password.data.encode('utf-8'), user["password"].encode('utf-8')).decode('utf-8')
 
         if user is None or user["password"] != hashed_password:

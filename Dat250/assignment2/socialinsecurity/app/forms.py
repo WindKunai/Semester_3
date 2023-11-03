@@ -19,6 +19,7 @@ from datetime import datetime
 from typing import cast
 
 from flask_wtf import FlaskForm
+from wtforms.validators import DataRequired
 from wtforms import (
     BooleanField,
     DateField,
@@ -41,8 +42,8 @@ from wtforms import (
 class LoginForm(FlaskForm):
     """Provides the login form for the application."""
 
-    username = StringField(label="Username", render_kw={"placeholder": "Username"})
-    password = PasswordField(label="Password", render_kw={"placeholder": "Password"})
+    username = StringField(label="Username", render_kw={"placeholder": "Username"}, validators=[DataRequired()])
+    password = PasswordField(label="Password", render_kw={"placeholder": "Password"}, validators=[DataRequired()])
     remember_me = BooleanField(
         label="Remember me"
     )  # TODO: It would be nice to have this feature implemented, probably by using cookies
@@ -52,11 +53,11 @@ class LoginForm(FlaskForm):
 class RegisterForm(FlaskForm):
     """Provides the registration form for the application."""
 
-    first_name = StringField(label="First Name", render_kw={"placeholder": "First Name"})
-    last_name = StringField(label="Last Name", render_kw={"placeholder": "Last Name"})
-    username = StringField(label="Username", render_kw={"placeholder": "Username"})
-    password = PasswordField(label="Password", render_kw={"placeholder": "Password"})
-    confirm_password = PasswordField(label="Confirm Password", render_kw={"placeholder": "Confirm Password"})
+    first_name = StringField(label="First Name", render_kw={"placeholder": "First Name"}, validators=[DataRequired()])
+    last_name = StringField(label="Last Name", render_kw={"placeholder": "Last Name"}, validators=[DataRequired()])
+    username = StringField(label="Username", render_kw={"placeholder": "Username"}, validators=[DataRequired()])
+    password = PasswordField(label="Password", render_kw={"placeholder": "Password"}, validators=[DataRequired()])
+    confirm_password = PasswordField(label="Confirm Password", render_kw={"placeholder": "Confirm Password"}, validators=[DataRequired()])
     submit = SubmitField(label="Sign Up")
 
 
