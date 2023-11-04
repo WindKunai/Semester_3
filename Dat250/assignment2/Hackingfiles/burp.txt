@@ -1,0 +1,23 @@
+POST /index HTTP/1.1
+Host: 127.0.0.1:5000
+Content-Length: 201
+Cache-Control: max-age=0
+sec-ch-ua: "Chromium";v="117", "Not;A=Brand";v="8"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+Upgrade-Insecure-Requests: 1
+Origin: http://127.0.0.1:5000
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.5938.132 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Referer: http://127.0.0.1:5000/index
+Accept-Encoding: gzip, deflate, br
+Accept-Language: nb-NO,nb;q=0.9,no;q=0.8,nn;q=0.7,en-US;q=0.6,en;q=0.5
+Cookie: session=eyJfcGVybWFuZW50Ijp0cnVlfQ.ZUV6Sw.Ea-yV3qj_GCdDDWOuB1tw0cG-vY
+Connection: close
+
+register-first_name=P%40ssw0rd&register-last_name=P%40ssw0rd&register-username=P%40ssw0rd&register-password=P%40ssw0rd&register-confirm_password=P%40ssw0rd&g-recaptcha-response=&register-submit=Sign+Up

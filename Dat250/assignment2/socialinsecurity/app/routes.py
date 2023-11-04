@@ -72,20 +72,20 @@ def index():
             return render_template("index.html.j2", title="Welcome", form=index_form)
 
         # Introduce a small delay to make it harder for attackers
-        time.sleep(2)
+        #time.sleep(2)
 
         # Use parameterized query to avoid SQL injection
     
         user = sqlite.select_user_by_username(username)
         
 
-        if not login_form.password.data:
-            flash("Sorry, failed to log in", category="warning")
-            return redirect(url_for("index"))
+        # if not login_form.password.data:
+        #     flash("Sorry, failed to log in, Error: 2", category="warning")
+        #     return redirect(url_for("index"))
         hashed_password = bcrypt.hashpw(login_form.password.data.encode('utf-8'), user["password"].encode('utf-8')).decode('utf-8')
 
         if user is None or user["password"] != hashed_password:
-            flash("Sorry, failed to log in", category="warning")
+            flash("Sorry, failed to log in, Error: 1", category="warning")
 
             if username in failed_login_attempts:
                 attempts, last_attempt_time = failed_login_attempts[username]
