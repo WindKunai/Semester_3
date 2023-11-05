@@ -18,14 +18,18 @@ from app.forms import CommentsForm, FriendsForm, IndexForm, PostForm, ProfileFor
 
 csp = {
     "default-src": "'self'",
-    "script-src": ["'self'", "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js", "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js", "https://www.google.com/recaptcha/api.js"],
+    "script-src": ["'self'", "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js", "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js", "https://www.google.com/recaptcha/api.js", "https://www.gstatic.com/recaptcha/releases/3sU2vDRVDmUU2E0Ro4VadvPr/recaptcha__en.js"],
     "style-src": ["'self'", "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"],
-    "font-src": ["'self'"],
-    "img-src": "'self'",
+    "font-src": ["'self'", "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0", "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.eot?#iefix&v=4.7.0 "],
+    "img-src": ["'self'", ""],
     "frame-src": ["'self'","https://www.youtube.com"],
     "frame-ancestors": "'none'",
     "form-action": "'self'",
 }
+
+# Initialize Talisman and set the CSP policy
+talisman = Talisman(app, content_security_policy=csp)
+
 
 def if_exits(username):
     user = sqlite.select_user_by_username(username)
@@ -33,8 +37,6 @@ def if_exits(username):
         flash("User no longer exists!")
         return render_template(index)
     
-# Initialize Talisman and set the CSP policy
-talisman = Talisman(app, content_security_policy=csp)
 valid_username_pattern = re.compile(r"^[a-zA-Z0-9_]+$")
 # Input validation for username
 def is_valid_username(username):
@@ -147,6 +149,8 @@ def index():
         if not is_valid_username(register_form.username.data):
             flash("Invalid username. Usernames can only contain letters, numbers, and underscores.", category="danger")
             return render_template("index.html.j2", title="Welcome", form=index_form)
+        
+        
         # Check if the password meets the strong password criteria
         strong_password_pattern = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
         if not re.match(strong_password_pattern, register_form.password.data):
@@ -196,9 +200,10 @@ def stream(username: str):
                 path = Path(app.instance_path) / app.config["UPLOADS_FOLDER_PATH"] / post_form.image.data.filename
                 post_form.image.data.save(path)
 
-            sanitizzed_content = sanitize_input(post_form.content.data, "posting")
+            #sanitized_content = sanitize_input(post_form.content.data, "posting")
 
-            sqlite.insert_post(user["id"], sanitizzed_content, post_form.image.data.filename)
+            #sqlite.insert_post(user["id"], sanitized_content, post_form.image.data.filename)
+            sqlite.insert_post(user["id"], post_form.content.data, post_form.image.data.filename)
 
             return redirect(url_for("stream", username=session['username']))
 

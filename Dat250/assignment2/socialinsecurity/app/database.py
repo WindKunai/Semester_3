@@ -108,15 +108,7 @@ class SQLite3:
         return conn
 
     def query(self, query: str, one: bool = False, params: tuple = ()) -> Any:
-        """Queries the database and returns the result.
 
-        params:
-            query: The SQL query to execute.
-            one: Whether to return a single row or a list of rows.
-            params: A tuple of parameters to pass to the query.
-
-        returns: A single row, a list of rows, or None.
-        """
         cursor = self.connection.cursor()
         cursor.execute(query, params)
         
