@@ -134,8 +134,7 @@ class SQLite3:
         return self.query(query, one=True, params=(username,))
     
     def register_user(self, username: str, first_name: str, last_name: str, password: str) -> None:
-        # Sanitize user input
-
+        
         query = "INSERT INTO Users (username, first_name, last_name, password) VALUES (?, ?, ?, ?);"
         params = (username, first_name, last_name, password)
 
@@ -148,6 +147,18 @@ class SQLite3:
         """
         params = (user_id, content, image_filename)
         self.query(query, params=params)
+
+    def profile_form_submission(
+        self, username: str, education: str, employment: str, music: str, movie: str, nationality: str, birthday: str
+    ) -> None:
+        update_profile_query = """
+            UPDATE Users
+            SET education = ?, employment = ?, music = ?, movie = ?,
+                nationality = ?, birthday = ?
+            WHERE username = ?;
+        """
+        params = (education, employment, music, movie, nationality, birthday, username)
+        self.query(update_profile_query, params=params)
 
     def _init_database(self, schema: PathLike | str) -> None:
         """Initializes the database with the supplied schema if it does not exist yet."""

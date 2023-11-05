@@ -10,9 +10,34 @@ from flask import flash, redirect, render_template, send_from_directory, url_for
 from functools import wraps
 import re
 import bcrypt
-
+import secrets
+from flask_talisman import Talisman
 from app import app, sqlite
 from app.forms import CommentsForm, FriendsForm, IndexForm, PostForm, ProfileForm
+
+
+csp = {
+    "default-src": "'self'",
+    "script-src": ["'self'", "code.jquery.com"],
+    "style-src": ["'self'", "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css", "'nonce-" + secrets.token_hex(16) + "'"],
+    "font-src": ["'self'", "fonts.gstatic.com"],
+    "img-src": "'self'",
+    "frame-src": "https://www.youtube.com",
+}
+
+# Initialize Talisman and set the CSP policy
+talisman = Talisman(app, content_security_policy=csp)
+valid_username_pattern = re.compile(r"^[a-zA-Z0-9_]+$")
+# Input validation for username
+def is_valid_username(username):
+    return bool(valid_username_pattern.match(username))
+
+# Input validation for passwords (add your own password complexity rules)
+def is_valid_password(password):
+    if len(password) < 8:
+        return False
+    # Add more password complexity rules here
+    return True
 
 
 # Dictionary to store failed login attempts and their last attempt time
@@ -63,7 +88,6 @@ def index():
     index_form = IndexForm()
     login_form = index_form.login
     register_form = index_form.register
-
     if login_form.is_submitted() and login_form.submit.data:
         username = login_form.username.data
 
@@ -79,28 +103,34 @@ def index():
         user = sqlite.select_user_by_username(username)
         
 
-        # if not login_form.password.data:
-        #     flash("Sorry, failed to log in, Error: 2", category="warning")
-        #     return redirect(url_for("index"))
-        hashed_password = bcrypt.hashpw(login_form.password.data.encode('utf-8'), user["password"].encode('utf-8')).decode('utf-8')
+        if not login_form.password.data:
+            flash("Sorry, failed to log in, NO Pwd entered", category="warning")
+            return redirect(url_for("index"))
+        
 
-        if user is None or user["password"] != hashed_password:
-            flash("Sorry, failed to log in, Error: 1", category="warning")
-
+        if user is None:
+            flash("Sorry, failed to log in, user NONE", category="warning")
+        
             if username in failed_login_attempts:
                 attempts, last_attempt_time = failed_login_attempts[username]
                 failed_login_attempts[username] = (attempts + 1, time.time())
             else:
                 failed_login_attempts[username] = (1, time.time())
 
-        elif user["password"] == hashed_password:
-            failed_login_attempts.pop(username, None)
-            session['username'] = username
-            return redirect(url_for("stream", username=session['username']))
+        if user != None:
+            hashed_password = bcrypt.hashpw(login_form.password.data.encode('utf-8'), user["password"].encode('utf-8')).decode('utf-8')    
+
+            if user["password"] == hashed_password:
+                failed_login_attempts.pop(username, None)
+                session['username'] = username
+                return redirect(url_for("stream", username=session['username']))
 
         return render_template("index.html.j2", title="Welcome", form=index_form)
 
     elif register_form.is_submitted() and register_form.submit.data:
+        if not is_valid_username(register_form.username.data):
+            flash("Invalid username. Usernames can only contain letters, numbers, and underscores.", category="danger")
+            return render_template("index.html.j2", title="Welcome", form=index_form)
         # Check if the password meets the strong password criteria
         if not re.match(strong_password_pattern, register_form.password.data):
             flash("Password does not meet the strong password criteria. It should contain at least one uppercase letter, one lowercase letter, one digit, one special character (@, $, !, %, *, ?, or &), and be at least 8 characters long.", category="danger")
@@ -260,7 +290,6 @@ def friends(username: str):
     friends = sqlite.query(get_friends)
     return render_template("friends.html.j2", title="Friends", username=username, friends=friends, form=friends_form)
 
-
 @app.route("/profile/<string:username>", methods=["GET", "POST"])
 @login_required
 def profile(username: str):
@@ -271,26 +300,23 @@ def profile(username: str):
     Otherwise, it reads the username from the URL and displays the user's profile.
     """
     profile_form = ProfileForm()
-    get_user = f"""
-        SELECT *
-        FROM Users
-        WHERE username = '{username}';
-        """
-    user = sqlite.query(get_user, one=True)
+
+    user = sqlite.select_user_by_username(username)
 
     if profile_form.is_submitted():
-        update_profile = f"""
-            UPDATE Users
-            SET education='{profile_form.education.data}', employment='{profile_form.employment.data}',
-                music='{profile_form.music.data}', movie='{profile_form.movie.data}',
-                nationality='{profile_form.nationality.data}', birthday='{profile_form.birthday.data}'
-            WHERE username='{username}';
-            """
-        sqlite.query(update_profile)
+        sanitized_education = sanitize_input(profile_form.education.data)
+        sanitized_employment = sanitize_input(profile_form.employment.data)
+        sanitized_music = sanitize_input(profile_form.music.data)
+        sanitized_movie = sanitize_input(profile_form.movie.data)
+        sanitized_nationality = sanitize_input(profile_form.nationality.data)
+        sanitized_birthday = sanitize_input(profile_form.birthday.data)
+
+        sqlite.profile_form_submission(
+            username, sanitized_education, sanitized_employment, sanitized_music, sanitized_movie, sanitized_nationality, sanitized_birthday
+        )
         return redirect(url_for("profile", username=username))
 
     return render_template("profile.html.j2", title="Profile", username=username, user=user, form=profile_form)
-
 
 @app.route("/uploads/<string:filename>")
 def uploads(filename):
