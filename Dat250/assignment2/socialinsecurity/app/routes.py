@@ -18,13 +18,21 @@ from app.forms import CommentsForm, FriendsForm, IndexForm, PostForm, ProfileFor
 
 csp = {
     "default-src": "'self'",
-    "script-src": ["'self'", "code.jquery.com"],
-    "style-src": ["'self'", "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css", "'nonce-" + secrets.token_hex(16) + "'"],
-    "font-src": ["'self'", "fonts.gstatic.com"],
+    "script-src": ["'self'", "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js", "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js", "https://www.google.com/recaptcha/api.js"],
+    "style-src": ["'self'", "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"],
+    "font-src": ["'self'"],
     "img-src": "'self'",
-    "frame-src": "https://www.youtube.com",
+    "frame-src": ["'self'","https://www.youtube.com"],
+    "frame-ancestors": "'none'",
+    "form-action": "'self'",
 }
 
+def if_exits(username):
+    user = sqlite.select_user_by_username(username)
+    if user is None:
+        flash("User no longer exists!")
+        return render_template(index)
+    
 # Initialize Talisman and set the CSP policy
 talisman = Talisman(app, content_security_policy=csp)
 valid_username_pattern = re.compile(r"^[a-zA-Z0-9_]+$")
@@ -58,6 +66,14 @@ def login_required(f):
         if 'username' not in session or session['username'] != kwargs.get('username'):
             flash("You are not authorized to access this page.", category="danger")
             return redirect(url_for("index"))
+        
+        username = session['username']
+        user = sqlite.select_user_by_username(username)
+
+        if user is None:
+            flash("Your user no longer exists in the database.", category="danger")
+            return redirect(url_for("index"))
+
         return f(*args, **kwargs)
     return decorated_function
 
