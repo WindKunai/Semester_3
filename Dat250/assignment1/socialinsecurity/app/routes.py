@@ -5,20 +5,23 @@ It also contains the SQL queries used for communicating with the database.
 """
 
 from pathlib import Path
-import time
-from flask import flash, redirect, render_template, send_from_directory, url_for, request, session
-import re
+
+from flask import flash, redirect, render_template, send_from_directory, url_for
 
 from app import app, sqlite
 from app.forms import CommentsForm, FriendsForm, IndexForm, PostForm, ProfileForm
 
-# Dictionary to store failed login attempts and their last attempt time
-failed_login_attempts = {}
-strong_password_pattern  = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/index", methods=["GET", "POST"])
 def index():
+    """Provides the index page for the application.
+
+    It reads the composite IndexForm and based on which form was submitted,
+    it either logs the user in or registers a new user.
+
+    If no form was submitted, it simply renders the index page.
+    """
     index_form = IndexForm()
     login_form = index_form.login
     register_form = index_form.register
@@ -30,32 +33,15 @@ def index():
             WHERE username = '{login_form.username.data}';
             """
         user = sqlite.query(get_user, one=True)
-        username = login_form.username.data
-        if user is None or user["password"] != login_form.password.data:
-            flash("Sorry, failed to log in", category="warning")
-            
-            if username in failed_login_attempts:
-                attempts, last_attempt_time = failed_login_attempts[username]
-                lockout_duration = 300  # Lockout duration in seconds
 
-                if attempts >= 3 and (time.time() - last_attempt_time) < lockout_duration:
-                    flash("Account temporarily locked due to multiple failed login attempts. Try again later.", category="danger")
-
-            if username in failed_login_attempts:
-                attempts, last_attempt_time = failed_login_attempts[username]
-                failed_login_attempts[username] = (attempts + 1, time.time())
-            else:
-                failed_login_attempts[username] = (1, time.time())
-
+        if user is None:
+            flash("Sorry, this user does not exist!", category="warning")
+        elif user["password"] != login_form.password.data:
+            flash("Sorry, wrong password!", category="warning")
         elif user["password"] == login_form.password.data:
-            failed_login_attempts.pop(username, None)
-            return redirect(url_for("stream", username=username))
+            return redirect(url_for("stream", username=login_form.username.data))
 
-    if register_form.is_submitted() and register_form.submit.data:
-        # Check if the password meets the strong password criteria
-        if not re.match(strong_password_pattern, register_form.password.data):
-            flash("Password does not meet the strong password criteria. It should contain at least one uppercase letter, one lowercase letter, one digit, one special character (@, $, !, %, *, ?, or &), and be at least 8 characters long.", category="danger")
-            return render_template("index.html.j2", title="Welcome", form=index_form)
+    elif register_form.is_submitted() and register_form.submit.data:
         insert_user = f"""
             INSERT INTO Users (username, first_name, last_name, password)
             VALUES ('{register_form.username.data}', '{register_form.first_name.data}', '{register_form.last_name.data}', '{register_form.password.data}');
@@ -65,8 +51,6 @@ def index():
         return redirect(url_for("index"))
 
     return render_template("index.html.j2", title="Welcome", form=index_form)
-
-
 
 
 @app.route("/stream/<string:username>", methods=["GET", "POST"])
@@ -89,10 +73,10 @@ def stream(username: str):
         if post_form.image.data:
             path = Path(app.instance_path) / app.config["UPLOADS_FOLDER_PATH"] / post_form.image.data.filename
             post_form.image.data.save(path)
-        sanitized_Input = escape(post_form.content.data)
+
         insert_post = f"""
             INSERT INTO Posts (u_id, content, image, creation_time)
-            VALUES ({user["id"]}, '{sanitized_Input}', '{post_form.image.data.filename}', CURRENT_TIMESTAMP);
+            VALUES ({user["id"]}, '{post_form.content.data}', '{post_form.image.data.filename}', CURRENT_TIMESTAMP);
             """
         sqlite.query(insert_post)
         return redirect(url_for("stream", username=username))
@@ -105,7 +89,6 @@ def stream(username: str):
         """
     posts = sqlite.query(get_posts)
     return render_template("stream.html.j2", title="Stream", username=username, form=post_form, posts=posts)
-
 
 
 @app.route("/comments/<string:username>/<int:post_id>", methods=["GET", "POST"])
@@ -236,8 +219,3 @@ def profile(username: str):
 def uploads(filename):
     """Provides an endpoint for serving uploaded files."""
     return send_from_directory(Path(app.instance_path) / app.config["UPLOADS_FOLDER_PATH"], filename)
-
-
-def escape(word):
-    word = word.replace("<", "&amp").replace(">", "&gt")
-    return word

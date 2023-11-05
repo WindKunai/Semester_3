@@ -78,7 +78,7 @@ def login_required(f):
     return decorated_function
 
 failed_login_attempts = {}
-strong_password_pattern = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+
 
 # Define a common function for checking the number of failed login attempts
 def check_failed_attempts(username):
@@ -148,13 +148,15 @@ def index():
             flash("Invalid username. Usernames can only contain letters, numbers, and underscores.", category="danger")
             return render_template("index.html.j2", title="Welcome", form=index_form)
         # Check if the password meets the strong password criteria
+        strong_password_pattern = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
         if not re.match(strong_password_pattern, register_form.password.data):
             flash("Password does not meet the strong password criteria. It should contain at least one uppercase letter, one lowercase letter, one digit, one special character (@, $, !, %, *, ?, or &), and be at least 8 characters long.", category="danger")
             return render_template("index.html.j2", title="Welcome", form=index_form)
 
-        # Sanitize user input
         hashed_password = bcrypt.hashpw(register_form.password.data.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
+        # Sanitize user input
+       
         sanitized_username = sanitize_input(register_form.username.data, 'username')
         sanitized_first_name = sanitize_input(register_form.first_name.data, 'first name')
         sanitized_last_name = sanitize_input(register_form.last_name.data, 'last name')

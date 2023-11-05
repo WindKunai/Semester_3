@@ -1,0 +1,439 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+    Bandit Report
+</title>
+
+<style>
+
+html * {
+    font-family: "Arial", sans-serif;
+}
+
+pre {
+    font-family: "Monaco", monospace;
+}
+
+.bordered-box {
+    border: 1px solid black;
+    padding-top:.5em;
+    padding-bottom:.5em;
+    padding-left:1em;
+}
+
+.metrics-box {
+    font-size: 1.1em;
+    line-height: 130%;
+}
+
+.metrics-title {
+    font-size: 1.5em;
+    font-weight: 500;
+    margin-bottom: .25em;
+}
+
+.issue-description {
+    font-size: 1.3em;
+    font-weight: 500;
+}
+
+.candidate-issues {
+    margin-left: 2em;
+    border-left: solid 1px; LightGray;
+    padding-left: 5%;
+    margin-top: .2em;
+    margin-bottom: .2em;
+}
+
+.issue-block {
+    border: 1px solid LightGray;
+    padding-left: .5em;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    margin-bottom: .5em;
+}
+
+.issue-sev-high {
+    background-color: Pink;
+}
+
+.issue-sev-medium {
+    background-color: NavajoWhite;
+}
+
+.issue-sev-low {
+    background-color: LightCyan;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="metrics">
+    <div class="metrics-box bordered-box">
+        <div class="metrics-title">
+            Metrics:<br>
+        </div>
+        Total lines of code: <span id="loc">607</span><br>
+        Total lines skipped (#nosec): <span id="nosec">0</span>
+    </div>
+</div>
+
+
+
+
+<br>
+<div id="results">
+    
+<div id="issue-0">
+<div class="issue-block issue-sev-low">
+    <b>hardcoded_password_string: </b> Possible hardcoded password: '^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'<br>
+    <b>Test ID:</b> B105<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/259.html" target="_blank">CWE-259</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>81<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b105_hardcoded_password_string.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b105_hardcoded_password_string.html</a><br>
+
+<div class="code">
+<pre>
+80	failed_login_attempts = {}
+81	strong_password_pattern = r&quot;^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&amp;])[A-Za-z\d@$!%*?&amp;]{8,}$&quot;
+82	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-1">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>185<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+184	        post_form = PostForm()
+185	        get_user = f&quot;&quot;&quot;
+186	            SELECT *
+187	            FROM Users
+188	            WHERE username = &#x27;{username}&#x27;;
+189	            &quot;&quot;&quot;
+190	        user = sqlite.query(get_user, one=True)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-2">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>203<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+202	
+203	        get_posts = f&quot;&quot;&quot;
+204	            SELECT p.*, u.*, (SELECT COUNT(*) FROM Comments WHERE p_id = p.id) AS cc
+205	            FROM Posts AS p JOIN Users AS u ON u.id = p.u_id
+206	            WHERE p.u_id IN (SELECT u_id FROM Friends WHERE f_id = {user[&quot;id&quot;]}) OR p.u_id IN (SELECT f_id FROM Friends WHERE u_id = {user[&quot;id&quot;]}) OR p.u_id = {user[&quot;id&quot;]}
+207	            ORDER BY p.creation_time DESC;
+208	            &quot;&quot;&quot;
+209	        posts = sqlite.query(get_posts)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-3">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>224<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+223	    comments_form = CommentsForm()
+224	    get_user = f&quot;&quot;&quot;
+225	        SELECT *
+226	        FROM Users
+227	        WHERE username = &#x27;{username}&#x27;;
+228	        &quot;&quot;&quot;
+229	    user = sqlite.query(get_user, one=True)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-4">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>232<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+231	    if comments_form.is_submitted():
+232	        insert_comment = f&quot;&quot;&quot;
+233	            INSERT INTO Comments (p_id, u_id, comment, creation_time)
+234	            VALUES ({post_id}, {user[&quot;id&quot;]}, &#x27;{comments_form.comment.data}&#x27;, CURRENT_TIMESTAMP);
+235	            &quot;&quot;&quot;
+236	        sqlite.query(insert_comment)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-5">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>238<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+237	
+238	    get_post = f&quot;&quot;&quot;
+239	        SELECT *
+240	        FROM Posts AS p JOIN Users AS u ON p.u_id = u.id
+241	        WHERE p.id = {post_id};
+242	        &quot;&quot;&quot;
+243	    get_comments = f&quot;&quot;&quot;
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-6">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>243<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+242	        &quot;&quot;&quot;
+243	    get_comments = f&quot;&quot;&quot;
+244	        SELECT DISTINCT *
+245	        FROM Comments AS c JOIN Users AS u ON c.u_id = u.id
+246	        WHERE c.p_id={post_id}
+247	        ORDER BY c.creation_time DESC;
+248	        &quot;&quot;&quot;
+249	    post = sqlite.query(get_post, one=True)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-7">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>266<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+265	    friends_form = FriendsForm()
+266	    get_user = f&quot;&quot;&quot;
+267	        SELECT *
+268	        FROM Users
+269	        WHERE username = &#x27;{username}&#x27;;
+270	        &quot;&quot;&quot;
+271	    user = sqlite.query(get_user, one=True)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-8">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>274<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+273	    if friends_form.is_submitted():
+274	        get_friend = f&quot;&quot;&quot;
+275	            SELECT *
+276	            FROM Users
+277	            WHERE username = &#x27;{friends_form.username.data}&#x27;;
+278	            &quot;&quot;&quot;
+279	        friend = sqlite.query(get_friend, one=True)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-9">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>280<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+279	        friend = sqlite.query(get_friend, one=True)
+280	        get_friends = f&quot;&quot;&quot;
+281	            SELECT f_id
+282	            FROM Friends
+283	            WHERE u_id = {user[&quot;id&quot;]};
+284	            &quot;&quot;&quot;
+285	        friends = sqlite.query(get_friends)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-10">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>294<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+293	        else:
+294	            insert_friend = f&quot;&quot;&quot;
+295	                INSERT INTO Friends (u_id, f_id)
+296	                VALUES ({user[&quot;id&quot;]}, {friend[&quot;id&quot;]});
+297	                &quot;&quot;&quot;
+298	            sqlite.query(insert_friend)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-11">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\app\routes.py" target="_blank">.\assignment2\socialinsecurity\app\routes.py</a><br>
+    <b>Line number: </b>301<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+300	
+301	    get_friends = f&quot;&quot;&quot;
+302	        SELECT *
+303	        FROM Friends AS f JOIN Users as u ON f.f_id = u.id
+304	        WHERE f.u_id = {user[&quot;id&quot;]} AND f.f_id != {user[&quot;id&quot;]};
+305	        &quot;&quot;&quot;
+306	    friends = sqlite.query(get_friends)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-12">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href=".\assignment2\socialinsecurity\tests\test_routes.py" target="_blank">.\assignment2\socialinsecurity\tests\test_routes.py</a><br>
+    <b>Line number: </b>34<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.7.5/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.7.5/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+33	    response = client.get(&quot;/&quot;)
+34	    assert response.status_code == 200
+</pre>
+</div>
+
+
+</div>
+</div>
+
+</div>
+
+</body>
+</html>
